@@ -56,9 +56,21 @@ In `type-of`, if the program binds an identifier that is already bound, the new 
 
 ## Lists
 
-Our Typed version of miniPlait now contains support for lists via the constant `empty` and the operations `link`, `is-empty`, `first`, and `rest`. Lists in miniPlait are _homogeneous_: all elements in the list must have the same type.
+Our Typed version of miniPlait now contains support for
+lists via the constant `empty` and the operations
+`link`, `is-empty`, `first`, and `rest`. Lists in miniPlait
+are _homogeneous_: all elements in the list must have the
+same type.
 
-A question to briefly consider: What is the `Type` of the empty list? It’s _polymorphic_: it can be a list of any type at all! Because it has no elements, there’s nothing to constrain its type. However, because our type checker is not polymorphic, we handle this with a simple expedient: we require that every empty list be annotated with a type for the elements (that will eventually be linked to it). Naturally, the elements that eventually are linked to it must be consistent with that annotated type.
+A question to briefly consider: What is the `Type` of the
+empty list? It’s _polymorphic_: it can be a list of any
+type at all! Because it has no elements, there’s nothing
+to constrain its type. However, because our type checker
+is not polymorphic, we handle this with a simple expedient:
+we require that every empty list be annotated with a type
+for the elements (that will eventually be linked to it).
+Naturally, the elements that eventually are linked to it
+must be consistent with that annotated type.
 
 Thus, our typed list semantics are as follows:
 
@@ -82,9 +94,16 @@ Thus, our typed list semantics are as follows:
 
     `(is-empty x)` returns `true` if `x` is `empty`; otherwise, it returns false.
 
-Whenever these type signatures are violated, the type checker should raise an error.
+Whenever these type signatures are violated,
+the type checker should raise an error.
 
-Error-checking `link` should occur in the following manner: If the type of the second argument to `link` isn't a `(List t)`, the `(error 'TypeError "error message here")` should be raised. If the second argument to `link` is a `(List t)` but the type of the first argument is not `t`, then `(error 'TypeError "error message here")` should be raised as well. For example,
+Error-checking `link` should occur in the following manner:
+If the type of the second argument to `link` isn't a
+`(List t)`, the `(error 'TypeError "error message here")`
+should be raised. If the second argument to `link` is
+a `(List t)` but the type of the first argument is
+not `t`, then `(error 'TypeError "error message here")`
+should be raised as well. For example,
 
 ```racket
 (link "hello" 3)
@@ -95,11 +114,19 @@ should all raise `(error 'TypeError "error message here")`.
 
 ## Error Catching
 
-Your type-checker should raise a generic Racket error in all scenarios that types do not match. When raising an error, follow the syntax below:
+Your type-checker should raise a generic Racket error in
+all scenarios that types do not match. When raising an
+error, follow the syntax below:
 
 `(error 'TypeError "error message here")`
 
-Racket's "error" function should be followed by a symbol, which is preceded by a single quotation mark. In this case, we put a string symbol "TypeError" after the error call, which allows us to raise an error, signifying that a TypeError has occurred. Here is the [Documentation](https://docs.racket-lang.org/plait/Predefined_Functions_and_Constants.html#%28def._%28%28lib._plait%2Fmain..rkt%29._error%29%29) for the error function call in plait language. 
+Racket's "error" function should be followed by a symbol,
+which is preceded by a single quotation mark. In this case,
+we put a string symbol "TypeError" after the error call,
+which allows us to raise an error, signifying that a
+TypeError has occurred. Here is the
+[Documentation](https://docs.racket-lang.org/plait/Predefined_Functions_and_Constants.html#%28def._%28%28lib._plait%2Fmain..rkt%29._error%29%29)
+for the error function call in plait language.
 
 The error your type-checker will raise are just like the error from [Interpreter](../1-interp/), but with a type instead of a value.
 

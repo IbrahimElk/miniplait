@@ -11,10 +11,750 @@
 ;; DO NOT EDIT ABOVE THIS LINE =================================================
 
 (define/provide-test-suite student-tests ;; DO NOT EDIT THIS LINE ==========
-  ; TODO: Add your own tests below!
+
+  ;; NOTE: Ibrahim
+  ;; interpret the *syntax* of Typed miniPlait, 
+  ;; but with the same, “untyped” *semantics* of
+  ;; the interpreter.
+
+  ;; INFO:
+  ;; BASIC
+
+  (test-raises-interp-error? "var-0" (eval `x))
+
+  (test-equal? "num-1"
+               (eval `2) (v-num 2))
   
-  (test-equal? "Works with Num primitive"
-               (eval `2) (v-num 2)))
+  (test-equal? "str-2"
+               (eval `"hello") (v-str "hello"))
+
+  (test-equal? "bool-3"
+               (eval `true) (v-bool #t))
+
+  (test-equal? "bool-4"
+               (eval `false) (v-bool #f))
+
+  (test-true   "lam-5"
+               (v-fun? (eval `{lam {x : Num} 5})))
+
+  (test-equal? "list-6"
+               (eval `{empty : Str})
+               (v-list empty))
+  
+  ;; INFO:
+  ;; BINARY OPERATIONS
+  ;; ADDITION
+
+  (test-raises-interp-error? "op-plus-0"
+               (eval `{+ 3 "5"}))
+
+  (test-raises-interp-error? "op-plus-1"
+               (eval `{+ 3 true}))
+  
+  (test-raises-interp-error? "op-plus-2"
+               (eval `{+ 3 {lam {x : Num} x}}))
+  
+  (test-raises-interp-error? "op-plus-3"
+               (eval `{+ 3 {lam {x : Num} x}}))
+
+  (test-raises-interp-error? "op-plus-4"
+               (eval `{+ "5" 3 }))
+
+  (test-raises-interp-error? "op-plus-5"
+               (eval `{+ true 3}))
+  
+  (test-raises-interp-error? "op-plus-6"
+               (eval `{+ {lam {x : Num} x} 3}))
+  
+  (test-raises-interp-error? "op-plus-7"
+               (eval `{+ {empty : Num} 3}))
+
+  (test-raises-interp-error? "op-plus-8"
+               (eval `{+ "3" 5}))
+  
+  (test-equal? "op-plus-9"
+               (eval `{+ 3 5})
+               (v-num 8))
+
+  (test-equal? "op-plus-10"
+               (eval `{+ 1 {+ 2 3}}) 
+               (v-num 6))
+  
+  (test-equal? "op-plus-11"
+               (eval `{+ {+ 1 2} 3}) 
+               (v-num 6))
+
+  (test-equal? "op-plus-12"
+               (eval `{+ 1 {+ {+ 2 3} 4}}) 
+               (v-num 10))
+
+  ;; INFO:
+  ;; APPENDING
+
+  (test-raises-interp-error? "op-append-0"
+               (eval `{++ "3" 5}))
+
+  (test-raises-interp-error? "op-append-1"
+               (eval `{++ "3" true}))
+  
+  (test-raises-interp-error? "op-append-2"
+               (eval `{++ "3" {lam {x : Num} x}}))
+
+  (test-raises-interp-error? "op-append-3"
+               (eval `{++ "3" {empty : Num}}))
+
+  (test-raises-interp-error? "op-append-4"
+               (eval `{++ 5 "3" }))
+
+  (test-raises-interp-error? "op-append-5"
+               (eval `{++ true "3"}))
+  
+  (test-raises-interp-error? "op-append-6"
+               (eval `{++ {lam {x : Num} x} "3"}))
+
+  (test-raises-interp-error? "op-append-7"
+               (eval `{++ {empty : Num} "3"}))
+  
+  (test-equal? "op-append-8"
+               (eval `{++ "3" "5"})
+               (v-str "35"))
+
+  (test-equal? "op-append-9"
+               (eval `{++ "hello" {++ " " "world"}}) 
+               (v-str "hello world"))
+  
+
+  ;; INFO:
+  ;; STRING-EQUAL?
+
+  (test-raises-interp-error? "op-streq-0"
+               (eval `{str= "3" 5}))
+  
+  (test-raises-interp-error? "op-streq-1"
+               (eval `{str= "3" true}))
+  
+  (test-raises-interp-error? "op-streq-2"
+               (eval `{str= "3" {lam {x : Num} x}}))
+  
+  (test-raises-interp-error? "op-streq-3"
+               (eval `{str= "3" {empty : Num}}))
+  
+  (test-raises-interp-error? "op-streq-4"
+               (eval `{str= 5 "3"}))
+  
+  (test-raises-interp-error? "op-streq-5"
+               (eval `{str= true "3"}))
+  
+  (test-raises-interp-error? "op-streq-6"
+               (eval `{str= {lam {x : Num} x} "3"}))
+  
+  (test-raises-interp-error? "op-streq-7"
+               (eval `{str= {empty : Num} "3"}))
+
+  (test-equal? "op-streq-8"
+               (eval `{str= "3" "5"})
+               (v-bool #f))
+
+  (test-equal? "op-streq-9"
+               (eval `{str= "3" "3"})
+               (v-bool #t))
+
+  ;; INFO:
+  ;; NUMBER-EQUAL? 
+
+  (test-raises-interp-error? "op-numeq-0"
+               (eval `{num= 3 "5"}))
+  
+  (test-raises-interp-error? "op-numeq-1"
+               (eval `{num= 3 true}))
+  
+  (test-raises-interp-error? "op-numeq-2"
+               (eval `{num= 3 {lam {x : Num} x}}))
+  
+  (test-raises-interp-error? "op-numeq-3"
+               (eval `{num= 3 {empty : Num}}))
+  
+  (test-raises-interp-error? "op-numeq-4"
+               (eval `{num= "5" 3}))
+  
+  (test-raises-interp-error? "op-numeq-5"
+               (eval `{num= true 3}))
+  
+  (test-raises-interp-error? "op-numeq-6"
+               (eval `{num= {lam {x : Num} x} 3}))
+  
+  (test-raises-interp-error? "op-numeq-7"
+               (eval `{num= {empty : Num} 3}))
+
+  (test-equal? "op-numeq-8"
+               (eval `{num= 3 5})
+               (v-bool #f))
+
+  (test-equal? "op-numeq-9"
+               (eval `{num= 3 3})
+               (v-bool #t))
+
+  ;; INFO:
+  ;; LINK 
+
+  ;; element to be added must have same type as list
+  ;; NOTE: not the case when we have only the interpreter
+  ;;       changed : op-link case 0 till 8
+  (test-equal? "op-link-0"
+               (eval `{link 3 {empty : Bool}})
+               (v-list (list (v-num 3))))
+
+  (test-equal? "op-link-1"
+               (eval `{link "3" {empty : Bool}})
+               (v-list (list (v-str "3"))))
+  
+  (test-equal? "op-link-2"
+               (eval `{link true {empty : Num}})
+               (v-list (list (v-bool #t))))
+  
+  ;; NOTE: Ibrahim
+  ;; would be more elegant to perform checks with pattern matching
+  ;; but ensure if test framework would allow...
+  (test-true "op-link-3"
+    (let ([result (eval `{link {lam {x : Num} x} {empty : Bool}})])
+      (and (v-list? result)
+           (let ([func (v-list-vals result)])
+             (and (not (empty? func))
+                  (v-fun? (first func)))))))
+
+  (test-equal? "op-link-4"
+               (eval `{link {empty : Num} {empty : Bool}})
+               (v-list (list (v-list empty))))
+  
+  (test-equal? "op-link-4.1"
+               (eval `{link 3
+                        {link "3"
+                          {link false
+                            {link {empty : Str}
+                              {empty : Bool}}}}})
+               (v-list (list (v-num 3) (v-str "3") (v-bool #f) (v-list empty))))
+  
+  ;; expected a list for the second argument
+  (test-raises-interp-error? "op-link-5"
+               (eval `{link "3" 5}))
+
+  (test-raises-interp-error? "op-link-6"
+               (eval `{link "3" "5"}))
+
+  (test-raises-interp-error? "op-link-7"
+               (eval `{link "3" true}))
+
+  (test-raises-interp-error? "op-link-8"
+               (eval `{link "3" {lam {x : Num} x}}))
+
+  (test-raises-interp-error? "op-link-8.1"
+               (eval `{link "3" {link 1 1}}))
+
+  ;; add element to list correctly
+  (test-equal? "op-link-9"
+               (eval `{link  3 {empty : Num}})
+               (v-list (list (v-num 3))))
+
+  (test-equal? "op-link-10"
+               (eval `{link  "3" {empty : Str}})
+               (v-list (list (v-str "3"))))
+
+  (test-equal? "op-link-11"
+               (eval `{link  true {empty : Bool}})
+               (v-list (list (v-bool #t))))
+  
+  (test-equal? "op-link-12"
+               (eval `{link  {empty : Bool} {empty : {List Bool}}})
+               (v-list (list (v-list '()))))
+
+  ;; (test-true   "op-link-13"
+  ;;              (v-fun? ...
+  ;;                (eval `{link  {lam {x : Num} x} {empty : {Num -> Num}}}))
+  
+  (test-equal? "op-link-14"
+               (eval `{link  3 {link  3 {empty : Num}}})
+               (v-list (list (v-num 3) (v-num 3))))
+
+  ;; INFO:
+  ;; UNARY OPERATIONS
+  ;; FIRST
+
+  ;; first can only applied to lists
+  (test-raises-interp-error? "uop-first-O"
+               (eval `{first 5}))
+
+  ;; NOTE: Ibrahim
+  ;; first can only be applied to non empty lists,
+  ;; type-checker cannot distinguish between empty and 
+  ;; non-empty lists. As far as the type-checker is 
+  ;; concerned, this is a valid operation.
+  (test-raises-interp-error? "uop-first-1"
+               (eval `{first {empty : Num}}))
+  
+  ;; the type of the first element of an empty list is the type
+  ;; of the list element
+  (test-equal? "uop-first-2"
+               (eval `{first {link 1 {empty : Num}}})
+               (v-num 1))
+
+  (test-equal? "uop-first-3"
+               (eval `{first {link false {empty : Bool}}})
+               (v-bool #f))
+
+  (test-equal? "uop-first-4"
+               (eval `{first {link "f" {empty : Str}}})
+               (v-str "f"))
+   
+  (test-true  "uop-first-5"
+               (v-fun? (eval `{first {link {lam {x : Num} 5} 
+                                     {empty : {Num -> Num}}}})))
+
+  (test-equal? "uop-first-6"
+               (eval 
+                 `{first {link {empty : Bool} {empty : {List Bool}}}})
+               (v-list empty))
+
+  ;; INFO:
+  ;; REST 
+
+  ;; rest can only be applied to lists
+  (test-raises-interp-error? "uop-rest-O"
+               (eval `{rest 5}))
+
+  ;; NOTE Ibrahim
+  ;; rest can only be applied to non empty lists,
+  ;; type-checker cannot distinguish between empty and 
+  ;; non-empty lists. As far as the type-checker is 
+  ;; concerned, this is a valid operation.
+  (test-raises-interp-error? "uop-rest-1"
+               (eval `{rest {empty : Num}}))
+
+  ;; the type of the rest of the list of an empty list is the type
+  ;; of the list itself
+  (test-equal? "uop-rest-2"
+               (eval `{rest {link 1 {empty : Num}}})
+               (v-list empty))
+
+  (test-equal? "uop-rest-3"
+               (eval `{rest {link false {empty : Bool}}})
+               (v-list empty))
+
+  (test-equal? "uop-rest-4"
+               (eval `{rest {link "f" {empty : Str}}})
+               (v-list empty))
+   
+  (test-equal? "uop-rest-5"
+               (eval `{rest {link {lam {x : Num} 5} 
+                                  {empty : {Num -> Num}}}})
+               (v-list empty))
+
+  (test-equal? "uop-rest-6"
+               (eval `{rest {link {empty : Bool} 
+                                  {empty : {List Bool}}}})
+               (v-list empty))
+
+  ;; INFO:
+  ;; IS-EMPTY?
+
+  ;; rest can only be applied to lists
+  (test-raises-interp-error? "isempty-0"
+               (eval `{is-empty 5}))
+
+  (test-equal? "uop-isempty-1"
+               (eval `{is-empty {empty : Num}})
+               (v-bool #t))
+
+  (test-equal? "uop-isempty-2"
+               (eval `{is-empty {empty : Bool}})
+               (v-bool #t))
+
+  (test-equal? "uop-isempty-3"
+               (eval `{is-empty {empty : Str}})
+               (v-bool #t))
+
+  (test-equal? "uop-isempty-4"
+               (eval `{is-empty {empty : {Num -> Num}}})
+               (v-bool #t))
+
+  (test-equal? "uop-isempty-5"
+               (eval `{is-empty {empty : {List Num}}})
+               (v-bool #t))
+
+  (test-equal? "uop-isempty-6"
+               (eval `{is-empty {empty : {List Num}}})
+               (v-bool #t))
+
+  (test-equal? "uop-isempty-7"
+               (eval `{is-empty {link 1 {empty : Num}}})
+               (v-bool #f))
+
+  (test-equal? "uop-isempty-8"
+               (eval `{is-empty {link false {empty : Bool}}})
+               (v-bool #f))
+  
+  (test-equal? "uop-isempty-9"
+               (eval `{is-empty {link "f" {empty : Str}}})
+               (v-bool #f))
+  
+  (test-equal? "uop-isempty-10"
+               (eval `{is-empty {link {lam {x : Num} 5} 
+                                {empty : {Num -> Num}}}})
+               (v-bool #f))
+  
+  (test-equal? "uop-isempty-11"
+               (eval `{is-empty {link {empty : Bool} 
+                                {empty : {List Bool}}}})
+               (v-bool #f))
+  
+  ;; INFO:
+  ;; IF STATEMENT 
+
+  ;; condition needs to be boolean
+  (test-raises-interp-error? "if-0"
+               (eval `{if 5 5 5}))
+                
+  ;; branches of if need to be of same type
+  ;; NOTE: not the case when we have only the interpreter 
+  (test-equal? "if-1"
+               (eval `{if false 5 false})
+               (v-bool #f))
+                 
+  ;; branches of if need to be of same type
+  ;; NOTE: not the case when we have only the interpreter 
+  (test-true   "if-2"
+               (v-fun? 
+                 (eval `{if false 
+                        {lam {a : Num} 5 }
+                        {lam {y : Num} "5"}})))
+  
+  ;; branches of if need to be of same type
+  ;; NOTE: not the case when we have only the interpreter 
+  (test-equal? "if-3"
+               (eval `{if false
+                   {empty : Num} 
+                   {empty : Str}})
+               (v-list empty))
+  
+  ;; branches of if need to be of same type
+  ;; NOTE: not the case when we have only the interpreter 
+  (test-equal? "if-4"
+               (eval `{if true false "5"})
+               (v-bool #f))
+
+  (test-equal? "if-5"
+               (eval `{if true 3 5})
+               (v-num 3))
+
+  (test-equal? "if-6"
+               (eval `{if false 3 5})
+               (v-num 5))
+  
+  (test-equal? "if-7"
+               (eval `{if true "3" "5"})
+               (v-str "3"))
+
+  (test-equal? "if-8"
+               (eval `{if true false true})
+               (v-bool #f))
+
+  (test-true "if-9"
+               (v-fun? (eval `{if true 
+                        {lam {a : Num} 5} 
+                        {lam {y : Num} 1}})))
+
+  (test-equal? "if-10"
+               (eval `{if true 
+                   {empty : Num} 
+                   {link 1 {empty : Num}}})
+               (v-list empty))
+  
+  ;; short-circuit
+  (test-equal? "if-11"
+               (eval `{if true "short" {+ 5 "error skibidi"}})
+               (v-str "short"))
+
+  ;; short-circuit
+  (test-equal? "if-12"
+               (eval `{if false {+ 5 "error skibidi"} "short"})
+               (v-str "short"))
+
+  ;; INFO:
+  ;; LAM STATEMENT 
+  
+  (test-true "lam-0"
+               (v-fun?
+                 (eval `{lam {a : Num} a})))
+  
+  ;; INFO:
+  ;; APP STATEMENT 
+  
+  (test-raises-interp-error? "app-01"
+               (eval `{5 5}))
+  
+  (test-raises-interp-error? "app-02"
+               (eval `{"5" 5}))
+  
+  (test-raises-interp-error? "app-03"
+               (eval `{false 5}))
+  
+  (test-raises-interp-error? "app-04"
+               (eval `{{empty : Num} 5}))
+
+  (test-raises-interp-error? "app-05"
+               (eval `{f 5}))
+
+  ;; actual and formal argument type need to correspond. 
+  ;; NOTE: not the case when we have only the interpreter 
+  (test-equal? "app-06.1"
+               (eval `{{lam {a : Num} a} "5"})
+               (v-str "5"))
+
+  ;; actual and formal argument type need to correspond. 
+  ;; NOTE: not the case when we have only the interpreter 
+  (test-equal? "app-06.2"
+               (eval `{{lam {a : Bool} a} "5"})
+               (v-str "5"))
+
+  ;; actual and formal argument type need to correspond. 
+  ;; NOTE: not the case when we have only the interpreter 
+  (test-equal? "app-06.3"
+               (eval `{{lam {a : Str} a} 5})
+               (v-num 5))
+
+  ;; actual and formal argument type need to correspond. 
+  ;; NOTE: not the case when we have only the interpreter 
+  (test-equal? "app-06.4"
+               (eval `{{lam {a : {List Num}} a} "5"})
+               (v-str "5"))
+
+  ;; actual and formal argument type need to correspond. 
+  ;; NOTE: not the case when we have only the interpreter 
+  (test-equal? "app-06.5"
+               (eval `{{lam {a : {Num -> Num}} a} "5"})
+               (v-str "5"))
+  
+  (test-raises-interp-error? "app-07"
+               (eval `{{lam {x : Num} y} 1}))
+
+  ;; scoping 
+  (test-raises-interp-error? "app-08"
+               (eval `{+ {{lam {x : Num} x} 1}  x}))
+
+  ;; shadowing
+  (test-equal? "app-1"
+               (eval `{{lam {x : Num} 
+                        {{lam {x : Num} 
+                          x} 3}} 5}) 
+               (v-num 3))
+
+  (test-equal? "app-4"
+               (eval `{{lam {a : Num} a} 5})
+               (v-num 5))
+
+  ;; `{let {x 1} {+ {let {x 2}   x}  x}}    => 3
+  (test-equal? "app-5"
+               (eval `{{lam {x : Num} 
+                       {+ {{lam {x : Num} x} 2} x}} 
+                       1}) 
+               (v-num 3))
+  
+  (test-equal? "app-6"
+               (eval `{{lam {x : Num} {+ x x}} 1})
+               (v-num 2))
+  
+  (test-equal? "app-7"
+               (eval `{{{lam {x : Num} 
+                        {lam {y : Num}
+                        {+ x y}}} 3} 4}) 
+               (v-num 7))
+
+  ;; `{{lam f {f 3}} {lambda x {+ x x}}}  => 6 
+  (test-equal? "app-8"
+               (eval `{{lam {f : {Num -> Num}} {f 3}} 
+                       {lam {x : Num} {+ x x}}}) 
+    (v-num 6))
+
+  ;; `{let1 {x 1}
+  ;;        {let1 {f {lambda y x}}
+  ;;              {let1 {x 2}
+  ;;                    {f 10}}}}
+  ;; `{{\x -> {{\f -> {{\x -> {f 10}} 2}}{lam y x}}}1}
+  (test-equal? "app-9"
+    (eval `{{lam {x : Num}  {{lam {f : {Num -> Num}} 
+           {{lam {x : Num}  {f 10}} 2}} {lam {y : Num} x}}} 1}) 
+    (v-num 1))
+
+  ;; `{{let1 {x 3}
+  ;;         {lambda y {+ x y}}}
+  ;;   4}
+  ;; `{{{\x -> {\y -> {+ x y}}}3}4}
+  (test-equal? "app-10"
+    (eval `{{{lam {x : Num} {lam {y : Num} {+ x y}}}3}4}) 
+           (v-num 7))
+
+  ;; ((let ([y 3])
+  ;;    (lambda (y) (+ y 1)))
+  ;;  5)
+  (test-equal? "app-11"
+    (eval `{{{lam {y : Num} {lam {y : Num} {+ y 1}}} 3} 5}) 
+           (v-num 6))
+  
+  ;; (deffun (f x)
+  ;;    (lambda (y) (+ x y)))
+  ;; (defvar x 0)
+  ;; ((f 2) 1)
+  (test-equal? "app-12"
+    (eval `{{{{ lam {x : Num} 
+          {lam {x : Num} 
+          {lam {y : Num} 
+          {+ x y}}}} 0} 2} 1}) (v-num 3))
+
+  ;; INFO:
+  ;; AND STATEMENT 
+
+  (test-raises-interp-error? "and-01" (eval `{and 5                  true}))
+  (test-raises-interp-error? "and-02" (eval `{and "str"              true}))
+  (test-raises-interp-error? "and-03" (eval `{and {lam {a : Num} a}  true}))
+  (test-raises-interp-error? "and-04" (eval `{and {empty : Num}      true}))
+  
+  (test-raises-interp-error? "and-05" (eval `{and true 5                }))
+  (test-raises-interp-error? "and-06" (eval `{and true "str"            }))
+  (test-raises-interp-error? "and-07" (eval `{and true {lam {a : Num} a}}))
+  (test-raises-interp-error? "and-08" (eval `{and true {empty : Num}    }))
+
+  (test-equal? "and-1"
+               (eval `{and true true}) (v-bool #t))
+
+  (test-equal? "and-2"
+               (eval `{and true false}) (v-bool #f))
+
+  (test-equal? "and-3"
+               (eval `{and false true}) (v-bool #f))
+
+  (test-equal? "and-4"
+               (eval `{and false false}) (v-bool #f))
+
+  (test-equal? "and-5"
+               (eval `{and {and true true} true}) (v-bool #t))
+
+  ;; short-circuit
+  (test-equal? "and-09" (eval `{and false 5                }) (v-bool #f))
+  (test-equal? "and-10" (eval `{and false "str"            }) (v-bool #f))
+  (test-equal? "and-11" (eval `{and false {lam {a : Num} a}}) (v-bool #f))
+  (test-equal? "and-12" (eval `{and false {empty : Num}    }) (v-bool #f))
+  
+  ;; INFO:
+  ;; OR STATEMENT 
+
+  (test-raises-interp-error? "or-01" (eval `{or 5                 false}))
+  (test-raises-interp-error? "or-02" (eval `{or "str"             false}))
+  (test-raises-interp-error? "or-03" (eval `{or {lam {a : Num} a} false}))
+  (test-raises-interp-error? "or-04" (eval `{or {empty : Num}     false}))
+
+  (test-raises-interp-error? "or-05" (eval `{or false 5                }))
+  (test-raises-interp-error? "or-06" (eval `{or false "str"            }))
+  (test-raises-interp-error? "or-07" (eval `{or false {lam {a : Num} a}}))
+  (test-raises-interp-error? "or-08" (eval `{or false {empty : Num}    }))
+
+  (test-equal? "or-1"
+               (eval `{or true true}) (v-bool #t))
+
+  (test-equal? "or-2"
+               (eval `{or true false}) (v-bool #t))
+
+  (test-equal? "or-3"
+               (eval `{or false true}) (v-bool #t))
+
+  (test-equal? "or-4"
+               (eval `{or false false}) (v-bool #f))
+
+  (test-equal? "or-5"
+               (eval `{or {or false true} false}) (v-bool #t))
+
+  ;; short-circuit
+  (test-equal? "or-09" (eval `{or true 5                }) (v-bool #t))
+  (test-equal? "or-10" (eval `{or true "str"            }) (v-bool #t))
+  (test-equal? "or-11" (eval `{or true {lam {a : Num} a}}) (v-bool #t))
+  (test-equal? "or-12" (eval `{or true {empty : Num}    }) (v-bool #t))
+
+  ;; INFO:
+  ;; LET STATEMENT 
+
+  ;; (test-raises-interp-error? "let-0" (eval `{let {3 5 : Num} x}))
+
+  (test-raises-interp-error? "let-1"
+               (eval `{let {x "foo" : Num} {+ x 1}}))
+
+  (test-equal? "let-2"
+               (eval `{let {x 5 : Num} x}) 
+               (v-num 5))
+
+  (test-equal? "let-3"
+               (eval `{let {x 5 : Num} 
+                      {let {y {+ x 2} : Num} 
+                      {+ x y}}}) 
+               (v-num 12))
+
+  ;; shadowing
+  (test-equal? "let-4"
+               (eval `{let {x 5 : Num} 
+                      {let {x 3 : Num} x}}) 
+               (v-num 3))
+
+  ;; recursive definition
+  ;; let x = \y -> x y
+  (test-raises-interp-error? "let-5"
+               (eval `{let {x {lam {y : Num} {x y}} : {Num -> Num}}
+                            {x 5}}))
+
+  ;; actual and formal argument type need to correspond. 
+  ;; NOTE: not the case when we have only the interpreter 
+  (test-equal? "let-06.1"
+               (eval `{let {a "5" : Num} a})
+               (v-str "5"))
+
+  ;; actual and formal argument type need to correspond. 
+  ;; NOTE: not the case when we have only the interpreter 
+  (test-equal? "let-06.2"
+               (eval `{let {a "5" : Bool} a})
+               (v-str "5"))
+
+  ;; actual and formal argument type need to correspond. 
+  ;; NOTE: not the case when we have only the interpreter 
+  (test-equal? "let-06.3"
+               (eval `{let {a 5 : Str} a})
+               (v-num 5))
+
+  ;; actual and formal argument type need to correspond. 
+  ;; NOTE: not the case when we have only the interpreter 
+  (test-equal? "let-06.4"
+               (eval `{let {a "5" : {List Num}} a})
+               (v-str "5"))
+
+  ;; actual and formal argument type need to correspond. 
+  ;; NOTE: not the case when we have only the interpreter 
+  (test-equal? "let-06.5"
+               (eval `{let {a "5" : {Num -> Num}} a})
+               (v-str "5"))
+
+
+  ;; TODO:
+  ;; { lam { a : Num } { ++ a "noice"} } "very "}
+
+  ;; TODO: niets aan te doen, is gwn mogelijk
+  ;; recursive definition without having the same symbol
+  ;; in the definition of a let.
+  ;; (test-raises-interp-error? "let-07"
+  ;;              (eval `{let {F {lam {self : Num} 
+  ;;                               {lam {n : Num} 
+  ;;                                 { if {num= n 0} 
+  ;;                                       1 
+  ;;                                       {+ n {{self self} {+ n 1}}}}
+  ;;                                       }} : Num }
+  ;;                          {{F F} 5}})
+  ;;              )
+
+)
 
 ;; DO NOT EDIT BELOW THIS LINE =================================================
 

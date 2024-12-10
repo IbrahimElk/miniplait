@@ -46,7 +46,7 @@ that follows this pattern:
 (test-equal? "test name" (desugar ...) ...)
 ```
 
-is _invalid!_ If you were to run this test on another `desugar` implementation
+is *invalid!* If you were to run this test on another `desugar` implementation
 that happens to produce a different correct desugared expression, it would fail.
 
 To judge whether your `desugar` implementation is correct, you will need your

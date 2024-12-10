@@ -1,13 +1,16 @@
 # Introduction
 
-> Note: this is an **optional "stretch" task**. If you completed all the previous 4 assignments and you want to obtain the bonus point to achieve a maximum grade, then you should also complete this task.
+> Note: this is an **optional "stretch" task**. If you completed all the previous 4
+assignments and you want to obtain the bonus point to achieve a maximum grade, 
+then you should also complete this task.
 
 For this assignment, you will implement a modified version of miniPlait that uses _lazy_ evaluation.
 
 Lazy programming is an idea from the 1970s and 1980s that is finally
 making it into mainstream programming, e.g., through Java 8's streams.
 
-The concept of Laziness is explained in the PLAI v3 textbook as a subsection in the chapter on "Non-standard models".
+The concept of Laziness is explained in the PLAI v3 textbook as a subsection in the chapter 
+on "Non-standard models".
 
 To understand how to implement laziness in an interpreter, see
 [chapter 17.1 of PLAI v2](http://cs.brown.edu/courses/cs173/2012/book/Alternate_Application_Semantics.html#%28part._.Lazy_.Application%29).
@@ -125,9 +128,9 @@ This assignment has fundamentally changed the dynamic semantics (i.e. the execut
 
 You will submit the following files for this assignment:
 
-* `tynterp.rkt` for your implementation
-*  and add your tests in `tynterp-tests.rkt`.
-*  you also updated your parser and language definition in `support.rkt`.
+- `tynterp.rkt` for your implementation
+- and add your tests in `tynterp-tests.rkt`.
+- you also updated your parser and language definition in `support.rkt`.
 
 For the mandatory reflection questions, you also submit `REPORT.md`.
 

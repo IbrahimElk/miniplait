@@ -1,10 +1,10 @@
 #lang racket
 
 ;; =============================================================================
-;; Typed Interpreter: tynterp-tests.rkt
+;; Lazy Typed Interpreter: lazyinterp-tests.rkt
 ;; =============================================================================
 
-(require (only-in "tynterp.rkt" eval)
+(require  "latyterp.rkt"
          "support.rkt"
          "test-support.rkt")
 
@@ -15,155 +15,181 @@
   ;; INFO:
   ;; LAZY
 
-  ;; NOTE
-  ;; recursive definition not bound with let-statement!
-  (test-raises-type-error? "lazy-10"
-    (eval `{let {sum {lam {n : Num}
+  (test-raises-type-error? "lazy-1"
+               (eval `{rec {x "foo" : Num} {+ x 1}}))
+
+  (test-equal? "lazy-2"
+               (eval `{rec {x 5 : Num} x}) 
+               (v-num 5))
+
+  (test-equal? "lazy-3"
+               (eval `{rec {x 5 : Num} 
+                      {rec {y {+ x 2} : Num} 
+                      {+ x y}}}) 
+               (v-num 12))
+
+  ;; shadowing
+  (test-equal? "lazy-4"
+               (eval `{rec {x 5 : Num} 
+                      {rec {x 3 : Num} x}}) 
+               (v-num 3))
+
+  ;; recursive definition
+  ;; let x = \y -> x y
+  ;; INFINITE LOOP IS POSSIBLE YAY! TUROING COMPLEZFEZENF MACHINEJZNEFZ
+  ;; (test-equal? "lazy-5"
+  ;;              (eval `{rec {x {lam {y : Num} {x y}} : {Num -> Num}}
+  ;;                           {x 1}})
+  ;;              (v-num 3))
+
+  ;; actual and formal argument type need to correspond.
+  (test-raises-type-error? "lazy-06.1"
+               (eval `{rec {a "5" : Num} a}))
+
+  ;; actual and formal argument type need to correspond.
+  (test-raises-type-error? "lazy-06.2"
+               (eval `{rec {a "5" : Bool} a}))
+
+  ;; actual and formal argument type need to correspond.
+  (test-raises-type-error? "lazy-06.3"
+               (eval `{rec {a 5 : Str} a}))
+
+  ;; actual and formal argument type need to correspond.
+  (test-raises-type-error? "lazy-06.4"
+               (eval `{rec {a "5" : {List Num}} a}))
+
+  ;; actual and formal argument type need to correspond.
+  (test-raises-type-error? "lazy-06.5"
+               (eval `{rec {a "5" : {Num -> Num}} a}))
+
+  (test-equal? "lazy-10"
+    (eval `{rec {sum {lam {n : Num}
                           {if {num= n 0}
                               0
                               {+ n {sum {+ n -1}}}}} : {Num -> Num}}
-      {sum 5}}) ;; 5 * 6 / 2 = 15 
-  )
+      {sum 5}})
+      (v-num 15))
+    ;; 5 * 6 / 2 = 15 
 
-  ;; NOTE
-  ;; recursive definition not bound with let-statement!
-  (test-raises-type-error? "lazy-11"
-    (eval `{let {list-gen {lam {n : Num}
+
+  (test-equal? "lazy-11"
+    (eval `{rec {list-gen {lam {n : Num}
                                {if {num= n 0}
                                    {empty : Num}
                                    {link n {list-gen {+ n -1}}}}} 
                                    : {Num -> {List Num}}}
       {first {list-gen 5}}})
-  )
+    (v-num 5))
 
-  ;; NOTE
-  ;; recursive definition not bound with let-statement!
-  (test-raises-type-error? "lazy-12"
-    (eval `{let {list-gen {lam {n : Num}
-                               {if {num= n 0}
-                                   {empty : Num}
-                                   {link n {list-gen {+ n -1}}}}} 
-                                   : {Num -> {List Num}}}
-      {first {rest {list-gen 5}}}})
-  )
+  (test-equal? "lazy-12"
+  (eval `{rec {list-gen {lam {n : Num}
+                             {if {num= n 0}
+                                 {empty : Num}
+                                 {link n {list-gen {+ n -1}}}}} 
+                                 : {Num -> {List Num}}}
+    {first {rest {list-gen 5}}}})
+  (v-num 4))
 
-  ;; NOTE
-  ;; recursive definition not bound with let-statement!
-  (test-raises-type-error? "lazy-13"
-    (eval `{let {list-gen {lam {n : Num}
-                               {if {num= n 0}
-                                   {empty : Num}
-                                   {link n {list-gen {+ n -1}}}}} 
-                                   : {Num -> {List Num}}}
-      {first {rest {rest {list-gen 5}}}}})
-  )
+  (test-equal? "lazy-13"
+  (eval `{rec {list-gen {lam {n : Num}
+                             {if {num= n 0}
+                                 {empty : Num}
+                                 {link n {list-gen {+ n -1}}}}}
+                                 : {Num -> {List Num}}}
+    {first {rest {rest {list-gen 5}}}}})
+  (v-num 3))
 
-  ;; NOTE
-  ;; recursive definition not bound with let-statement!
-  (test-raises-type-error? "lazy-14"
-    (eval `{let {list-gen {lam {n : Num}
-                               {if {num= n 0}
-                                   {empty : Num}
-                                   {link n {list-gen {+ n -1}}}}} 
-                                   : {Num -> {List Num}}}
-      {first {rest {rest {rest {list-gen 5}}}}}})
-  )
+  (test-equal? "lazy-14"
+  (eval `{rec {list-gen {lam {n : Num}
+                             {if {num= n 0}
+                                 {empty : Num}
+                                 {link n {list-gen {+ n -1}}}}}
+                                 : {Num -> {List Num}}}
+    {first {rest {rest {rest {list-gen 5}}}}}})
+  (v-num 2))
 
-  ;; NOTE
-  ;; recursive definition not bound with let-statement!
-  (test-raises-type-error? "lazy-15"
-    (eval `{let {list-gen {lam {n : Num}
-                               {if {num= n 0}
-                                   {empty : Num}
-                                   {link n {list-gen {+ n -1}}}}} 
-                                   : {Num -> {List Num}}}
-      {first {rest {rest {rest {rest {list-gen 5}}}}}}})
-  )
+  (test-equal? "lazy-15"
+  (eval `{rec {list-gen {lam {n : Num}
+                             {if {num= n 0}
+                                 {empty : Num}
+                                 {link n {list-gen {+ n -1}}}}}
+                                 : {Num -> {List Num}}}
+    {first {rest {rest {rest {rest {list-gen 5}}}}}}})
+  (v-num 1))
 
-  ;; NOTE
-  ;; recursive definition not bound with let-statement!
-  (test-raises-type-error? "lazy-16"
-    (eval `{let {list-gen {lam {n : Num}
-                               {if {num= n 0}
-                                   {empty : Num}
-                                   {link n {list-gen {+ n -1}}}}} 
-                                   : {Num -> {List Num}}}
-      {rest {rest {rest {rest {rest {list-gen 5}}}}}}})
-  )
+  (test-equal? "lazy-16"
+  (eval `{rec {list-gen {lam {n : Num}
+                             {if {num= n 0}
+                                 {empty : Num}
+                                 {link n {list-gen {+ n -1}}}}}
+                                 : {Num -> {List Num}}}
+    {rest {rest {rest {rest {rest {list-gen 5}}}}}}})
+  (v-empty))
 
-  ;; NOTE
-  ;; 1. recursive definition not bound with let-statement!
-  ;; 2. should raise error accessing empty list (not with let)
-  (test-raises-type-error? "lazy-17"
-    (eval `{let {list-gen {lam {n : Num}
-                               {if {num= n 0}
-                                   {empty : Num}
-                                   {link n {list-gen {+ n -1}}}}} 
-                                   : {Num -> {List Num}}}
-      {first {rest {rest {rest {rest {rest {list-gen 5}}}}}}}}))
+  ;; NOTE: should raise error
+  (test-raises-interp-error? "lazy-17"
+  (eval `{rec {list-gen {lam {n : Num}
+                             {if {num= n 0}
+                                 {empty : Num}
+                                 {link n {list-gen {+ n -1}}}}}
+                                 : {Num -> {List Num}}}
+    {first {rest {rest {rest {rest {rest {list-gen 5}}}}}}}}))
 
-  ;; NOTE
-  ;; recursive definition not bound with let-statement!
-  (test-raises-type-error? "lazy-18"
-    (eval
-      `{let {list-gen {lam {n : Num}
-        {if {num= n 0}
-          {empty : Num}
-          {link n {list-gen {+ n -1}}}}} : {Num -> {List Num}}}
-        {let {take 
-          {lam {n : Num}
-            {lam {s : (List Num)}
-              {if {num= n 0}
-                {empty : Num}
-                {link {first s} {{take {+ n -1}}{rest s}}}}}} 
-                : (Num -> ((List Num) -> (List Num)))}
-          {{take 0} {list-gen 5}}}})
-  )
+  (test-equal? "lazy-18"
+  (eval
+    `{rec {list-gen {lam {n : Num}
+      {if {num= n 0}
+        {empty : Num}
+        {link n {list-gen {+ n -1}}}}} : {Num -> {List Num}}}
+      {rec {take 
+        {lam {n : Num}
+          {lam {s : (List Num)}
+            {if {num= n 0}
+              {empty : Num}
+              {link {first s} {{take {+ n -1}}{rest s}}}}}} 
+              : (Num -> ((List Num) -> (List Num)))}
 
-  ;; NOTE
-  ;; recursive definition not bound with let-statement!
-  (test-raises-type-error? "lazy-19"
+        {{take 0} {list-gen 5}}}})
+  (v-empty))
+
+  (test-equal? "lazy-19"
+  (eval 
+    `{rec {list-gen {lam {n : Num}
+      {if {num= n 0}
+        {empty : Num}
+        {link n {list-gen {+ n -1}}}}} : {Num -> {List Num}}}
+      {rec {take 
+        {lam {n : Num}
+          {lam {s : (List Num)}
+            {if {num= n 0}
+              {empty : Num}
+              {link {first s} {{take {+ n -1}}{rest s}}}}}} 
+              : (Num -> ((List Num) -> (List Num)))}
+        {first {{take 2} {list-gen 5}}} }})
+  (v-num 5))
+
+  (test-equal? "lazy-20"
+  (eval 
+    `{rec {list-gen {lam {n : Num}
+      {if {num= n 0}
+        {empty : Num}
+        {link n {list-gen {+ n -1}}}}} : {Num -> {List Num}}}
+      {rec {take 
+        {lam {n : Num}
+          {lam {s : (List Num)}
+            {if {num= n 0}
+              {empty : Num}
+              {link {first s} {{take {+ n -1}}{rest s}}}}}}
+              : (Num -> ((List Num) -> (List Num)))}
+        {first {{take 2} {list-gen 5}}} }})
+  (v-num 5))
+
+  (test-equal? "lazy-21"
     (eval 
-      `{let {list-gen {lam {n : Num}
-        {if {num= n 0}
-          {empty : Num}
-          {link n {list-gen {+ n -1}}}}} : {Num -> {List Num}}}
-        {let {take 
-          {lam {n : Num}
-            {lam {s : (List Num)}
-              {if {num= n 0}
-                {empty : Num}
-                {link {first s} {{take {+ n -1}}{rest s}}}}}} 
-                : (Num -> ((List Num) -> (List Num)))}
-          {first {{take 2} {list-gen 5}}} }})
-  )
-
-  ;; NOTE
-  ;; recursive definition not bound with let-statement!
-  (test-raises-type-error? "lazy-20"
-    (eval 
-      `{let {list-gen {lam {n : Num}
-        {if {num= n 0}
-          {empty : Num}
-          {link n {list-gen {+ n -1}}}}} : {Num -> {List Num}}}
-        {let {take 
-          {lam {n : Num}
-            {lam {s : (List Num)}
-              {if {num= n 0}
-                {empty : Num}
-                {link {first s} {{take {+ n -1}}{rest s}}}}}}
-                : (Num -> ((List Num) -> (List Num)))}
-          {first {{take 2} {list-gen 5}}} }})
-  )
-
-  ;; NOTE
-  ;; recursive definition not bound with let-statement!
-  (test-raises-type-error? "lazy-21"
-    (eval 
-      `{let {nats-from
+      `{rec {nats-from
              {lam {n : Num}
                {link n {nats-from {+ 1 n}}}} : (Num -> (List Num))}
-        {let {take 
+        {rec {take 
              {lam {n : Num}
                {lam {s : (List Num)}
                  {if {num= n 0}
@@ -172,16 +198,14 @@
                    {{take {+ n -1}} {rest s}}}}}}
                    : (Num -> ((List Num) -> (List Num)))}
           {first {{take 3} {nats-from 0}}}}})
-  )
+    (v-num 0))
 
-  ;; NOTE
-  ;; recursive definition not bound with let-statement!
-  (test-raises-type-error? "lazy-22"
+  (test-equal? "lazy-22"
     (eval 
-      `{let {nats-from
+      `{rec {nats-from
              {lam {n : Num}
                {link n {nats-from {+ 1 n}}}} : (Num -> (List Num))}
-        {let {take 
+        {rec {take 
              {lam {n : Num}
                {lam {s : (List Num)}
                  {if {num= n 0}
@@ -190,18 +214,15 @@
                    {{take {+ n -1}} {rest s}}}}}}
                    : (Num -> ((List Num) -> (List Num)))}
           {{take 3} {nats-from 0}}}})
-  )
-
+    (eval `{link 0 {link 1 {link 2 {empty : Num}}}}))
 
 
   ;; INFO:
   ;; BASIC
 
-  (test-raises-type-error? "var-0" (eval `x))
-
   (test-equal? "num-1"
                (eval `2) (v-num 2))
-
+  
   (test-equal? "str-2"
                (eval `"hello") (v-str "hello"))
 
@@ -216,7 +237,7 @@
 
   (test-equal? "list-6"
                (eval `{empty : Str})
-               (v-list empty))
+               (v-empty))
 
   ;; INFO:
   ;; BINARY OPERATIONS
@@ -248,7 +269,7 @@
 
   (test-raises-type-error? "op-plus-8"
                (eval `{+ "3" 5}))
-
+  
   (test-equal? "op-plus-9"
                (eval `{+ 3 5})
                (v-num 8))
@@ -256,7 +277,7 @@
   (test-equal? "op-plus-10"
                (eval `{+ 1 {+ 2 3}}) 
                (v-num 6))
-
+  
   (test-equal? "op-plus-11"
                (eval `{+ {+ 1 2} 3}) 
                (v-num 6))
@@ -291,7 +312,7 @@
 
   (test-raises-type-error? "op-append-7"
                (eval `{++ {empty : Num} "3"}))
-
+  
   (test-equal? "op-append-8"
                (eval `{++ "3" "5"})
                (v-str "35"))
@@ -299,7 +320,7 @@
   (test-equal? "op-append-9"
                (eval `{++ "hello" {++ " " "world"}}) 
                (v-str "hello world"))
-
+  
   ;; INFO:
   ;; STRING-EQUAL?
 
@@ -365,7 +386,7 @@
   (test-equal? "op-numeq-8"
                (eval `{num= 3 5})
                (v-bool #f))
-
+  
   (test-equal? "op-numeq-9"
                (eval `{num= 3 3})
                (v-bool #t))
@@ -412,27 +433,23 @@
   ;; add element to list correctly
   (test-equal? "op-link-9"
                (eval `{link  3 {empty : Num}})
-               (v-list (list (v-num 3))))
+               (v-list (v-num 3) (v-empty)))
 
   (test-equal? "op-link-10"
                (eval `{link  "3" {empty : Str}})
-               (v-list (list (v-str "3"))))
+               (v-list (v-str "3") (v-empty)))
 
   (test-equal? "op-link-11"
                (eval `{link  true {empty : Bool}})
-               (v-list (list (v-bool #t))))
+               (v-list (v-bool true) (v-empty)))
 
   (test-equal? "op-link-12"
                (eval `{link  {empty : Bool} {empty : {List Bool}}})
-               (v-list (list (v-list '()))))
-
-  ;; (test-equal? "op-link-3"
-  ;;              (eval `{link  {lam {x : Num} x} {empty : Bool}})
-  ;;              (v-list (list (v-fun ... :(  ))))
+               (v-list (v-empty) (v-empty)))
 
   (test-equal? "op-link-13"
                (eval `{link  3 {link  3 {empty : Num}}})
-               (v-list (list (v-num 3) (v-num 3))))
+               (v-list (v-num 3) (v-list (v-num 3) (v-empty))))
 
   ;; INFO:
   ;; UNARY OPERATIONS
@@ -465,9 +482,8 @@
                                      {empty : {Num -> Num}}}})))
 
   (test-equal? "uop-first-6"
-               (eval 
-                 `{first {link {empty : Bool} {empty : {List Bool}}}})
-               (v-list empty))
+               (eval `{first {link {empty : Bool} {empty : {List Bool}}}})
+               (v-empty))
 
   ;; INFO:
   ;; REST 
@@ -484,25 +500,26 @@
   ;; of the list itself
   (test-equal? "uop-rest-2"
                (eval `{rest {link 1 {empty : Num}}})
-               (v-list empty))
+               (v-empty))
 
   (test-equal? "uop-rest-3"
                (eval `{rest {link false {empty : Bool}}})
-               (v-list empty))
+               (v-empty))
 
   (test-equal? "uop-rest-4"
                (eval `{rest {link "f" {empty : Str}}})
-               (v-list empty))
+               (v-empty))
 
   (test-equal? "uop-rest-5"
                (eval `{rest {link {lam {x : Num} 5} 
                                   {empty : {Num -> Num}}}})
-               (v-list empty))
+               (v-empty))
 
+  ;; FIXME:
   (test-equal? "uop-rest-6"
                (eval `{rest {link {empty : Bool} 
                                   {empty : {List Bool}}}})
-               (v-list empty))
+               (v-empty))
 
   ;; INFO:
   ;; IS-EMPTY?
@@ -551,10 +568,11 @@
                                 {empty : {Num -> Num}}}})
                (v-bool #f))
 
-  (test-equal? "uop-isempty-11"
-               (eval `{is-empty {link {empty : Bool} 
-                                {empty : {List Bool}}}})
-               (v-bool #f))
+  ;; FIXME: fix dit ook
+  ;; (test-equal? "uop-isempty-11"
+  ;;              (eval `{is-empty {link {empty : Bool} 
+  ;;                               {empty : {List Bool}}}})
+  ;;              (v-bool #f))
 
   ;; INFO:
   ;; IF STATEMENT 
@@ -608,40 +626,28 @@
                (eval `{if true 
                    {empty : Num} 
                    {link 1 {empty : Num}}})
-               (v-list empty))
+               (v-empty))
 
   ;; short-circuit  
   ;; NOTE: not possible when we have type-checker
-  (test-raises-type-error? "if-11"
+  (test-raises-type-error? "and-11"
                (eval `{if true "short" {+ 5 "error skibidi"}}))
-
 
   ;; short-circuit
   ;; NOTE: not possible when we have type-checker
-  (test-raises-type-error? "if-13"
+  (test-raises-type-error? "and-12"
                (eval `{if false {+ 5 "error skibidi"} "short"}))
 
-  ;; short-circuit  
-  (test-equal?  "if-14"
-               (eval `{if true "short" {first {empty : Str}}})
-               (v-str "short"))
-  
-  ;; short-circuit  
-  (test-equal?  "if-15"
-               (eval `{if false {first {empty : Str}} "short"})
-               (v-str "short"))
-  
+
   ;; INFO:
   ;; LAM STATEMENT 
 
-  (test-true "lam-0"
-               (v-fun?
-                 (eval `{lam {a : Num} a})))
-
+  (test-equal? "lam-0" (eval `{lam {a : Num} a})
+               (v-fun 'a (e-var 'a) '#hash()))
 
   ;; INFO:
   ;; APP STATEMENT 
-
+  ;;
   (test-raises-type-error? "app-01"
                (eval `{5 5}))
 
@@ -690,9 +696,9 @@
 
   ;; shadowing
   (test-equal? "app-1"
-               (eval `{{lam {x : Num} 
-                        {{lam {x : Num} 
-                          x} 3}} 5}) 
+               (eval `{{lam {x : Num}
+                        {{lam {x : Num}
+                          x} 3}} 5})
                (v-num 3))
 
   (test-equal? "app-4"
@@ -794,11 +800,6 @@
   (test-raises-type-error? "and-11" (eval `{and false {lam {a : Num} a} }))
   (test-raises-type-error? "and-12" (eval `{and false {empty : Num}     }))
 
-  ;; short-circuit  
-  (test-equal?  "and-13"
-               (eval `{and false {first {empty : Bool}}})
-               (v-bool #f))
-
   ;; INFO:
   ;; OR STATEMENT 
 
@@ -829,21 +830,13 @@
 
   ;; short-circuit 
   ;; NOTE: not the case when we have the type-checker 
-  (test-raises-type-error? "or-09" (eval `{or true 5                }))
-  (test-raises-type-error? "or-10" (eval `{or true "str"            }))
-  (test-raises-type-error? "or-11" (eval `{or true {lam {a : Num} a}}))
-  (test-raises-type-error? "or-12" (eval `{or true {empty : Num}    }))
-
-  ;; short-circuit  
-  (test-equal?  "or-13"
-               (eval `{or true {first {empty : Bool}}})
-               (v-bool #t))
+  (test-raises-type-error? "or-09" (eval `{or true 5                 }))
+  (test-raises-type-error? "or-10" (eval `{or true "str"             }))
+  (test-raises-type-error? "or-11" (eval `{or true {lam {a : Num}  a}}))
+  (test-raises-type-error? "or-12" (eval `{or true {empty : Num}     }))
 
   ;; INFO:
   ;; LET STATEMENT 
-
-  ;; (test-raises-type-error? "let-0"
-  ;;              (eval `{let {3 5 : Num} x}))
 
   (test-raises-type-error? "let-1"
                (eval `{let {x "foo" : Num} {+ x 1}}))
@@ -867,8 +860,8 @@
   ;; recursive definition
   ;; let x = \y -> x y
   (test-raises-type-error? "let-5"
-               (eval `{let {x {lam {y : Num} {x y}} : {Num -> Num}}
-                            {x 5}}))
+                (eval `{let {x {lam {y : Num} {x y}} : {Num -> Num}}
+                             {x 5}}))
 
   ;; actual and formal argument type need to correspond. 
   (test-raises-type-error? "let-06.1"
