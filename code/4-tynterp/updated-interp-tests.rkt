@@ -737,23 +737,6 @@
                (eval `{let {a "5" : {Num -> Num}} a})
                (v-str "5"))
 
-
-  ;; TODO:
-  ;; { lam { a : Num } { ++ a "noice"} } "very "}
-
-  ;; TODO: niets aan te doen, is gwn mogelijk
-  ;; recursive definition without having the same symbol
-  ;; in the definition of a let.
-  ;; (test-raises-interp-error? "let-07"
-  ;;              (eval `{let {F {lam {self : Num} 
-  ;;                               {lam {n : Num} 
-  ;;                                 { if {num= n 0} 
-  ;;                                       1 
-  ;;                                       {+ n {{self self} {+ n 1}}}}
-  ;;                                       }} : Num }
-  ;;                          {{F F} 5}})
-  ;;              )
-
 )
 
 ;; DO NOT EDIT BELOW THIS LINE =================================================

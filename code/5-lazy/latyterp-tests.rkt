@@ -515,7 +515,6 @@
                                   {empty : {Num -> Num}}}})
                (v-empty))
 
-  ;; FIXME:
   (test-equal? "uop-rest-6"
                (eval `{rest {link {empty : Bool} 
                                   {empty : {List Bool}}}})
@@ -567,12 +566,6 @@
                (eval `{is-empty {link {lam {x : Num} 5} 
                                 {empty : {Num -> Num}}}})
                (v-bool #f))
-
-  ;; FIXME: fix dit ook
-  ;; (test-equal? "uop-isempty-11"
-  ;;              (eval `{is-empty {link {empty : Bool} 
-  ;;                               {empty : {List Bool}}}})
-  ;;              (v-bool #f))
 
   ;; INFO:
   ;; IF STATEMENT 
@@ -638,6 +631,15 @@
   (test-raises-type-error? "and-12"
                (eval `{if false {+ 5 "error skibidi"} "short"}))
 
+  ;; short-circuit  
+  (test-equal?  "if-14"
+               (eval `{if true "short" {first {empty : Str}}})
+               (v-str "short"))
+  
+  ;; short-circuit  
+  (test-equal?  "if-15"
+               (eval `{if false {first {empty : Str}} "short"})
+               (v-str "short"))
 
   ;; INFO:
   ;; LAM STATEMENT 
@@ -800,6 +802,11 @@
   (test-raises-type-error? "and-11" (eval `{and false {lam {a : Num} a} }))
   (test-raises-type-error? "and-12" (eval `{and false {empty : Num}     }))
 
+  ;; short-circuit  
+  (test-equal?  "and-13"
+               (eval `{and false {first {empty : Bool}}})
+               (v-bool #f))
+
   ;; INFO:
   ;; OR STATEMENT 
 
@@ -834,6 +841,11 @@
   (test-raises-type-error? "or-10" (eval `{or true "str"             }))
   (test-raises-type-error? "or-11" (eval `{or true {lam {a : Num}  a}}))
   (test-raises-type-error? "or-12" (eval `{or true {empty : Num}     }))
+
+  ;; short-circuit  
+  (test-equal?  "or-13"
+               (eval `{or true {first {empty : Bool}}})
+               (v-bool #t))
 
   ;; INFO:
   ;; LET STATEMENT 

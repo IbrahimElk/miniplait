@@ -345,6 +345,12 @@
           {lam y 
           {+ x y}}}} 0} 2} 1}) (v-num 3))
 
+  (test-raises-error? "app-13"
+    (eval `{{lam {n : Num}
+                 {if {num= n 0}
+                     0
+                     {+ n {sum {+ n -1}}}}} 5}))
+
   ;; INFO:
   ;; AND STATEMENT 
 

@@ -208,12 +208,12 @@
   (test-raises-type-error? "op-link-4"
                (type-check `{link {empty : Num} {empty : Bool}}))
   
-  ;; (test-raises-type-error? "op-link-4.1"
-  ;;              (eval `{link 3
-  ;;                       {link "3"
-  ;;                         {link false
-  ;;                           {link {empty : Str}
-  ;;                             {empty : (List Bool)}}}}}))
+  (test-raises-type-error? "op-link-4.1"
+               (type-check `{link 3
+                              {link "3"
+                                {link false
+                                  {link {empty : Str}
+                                    {empty : (List Bool)}}}}}))
   
   ;; expected a list for the second argument
   (test-raises-type-error? "op-link-5"

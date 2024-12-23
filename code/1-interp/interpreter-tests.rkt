@@ -12,8 +12,6 @@
 
 (define/provide-test-suite student-tests ;; DO NOT EDIT THIS LINE ==========
 
-  ;; FIXME: add parser tests or not ?
-
   ;; INFO:
   ;; BASIC
 
@@ -236,12 +234,12 @@
                         {lam y 1}})))
 
   ;; short-circuit
-  (test-equal? "and-11"
+  (test-equal? "if-10"
                (eval `{if true "short" {+ 5 "error skibidi"}})
                (v-str "short"))
 
   ;; short-circuit
-  (test-equal? "and-12"
+  (test-equal? "if-11"
                (eval `{if false {+ 5 "error skibidi"} "short"})
                (v-str "short"))
 
@@ -274,7 +272,7 @@
                (eval `{{lam x y} 1}))
 
   ;; scoping 
-  (test-raises-error? "app-07"
+  (test-raises-error? "app-08"
                (eval `{+ {{lam x x} 1}  x}))
 
   ;; shadowing
@@ -345,6 +343,12 @@
           {lam x 
           {lam y 
           {+ x y}}}} 0} 2} 1}) (v-num 3))
+
+  (test-raises-error? "app-01"
+    (eval `{{lam {n : Num}
+                 {if {num= n 0}
+                     0
+                     {+ n {sum {+ n -1}}}}} 5}))
 
 )
 ;; DO NOT EDIT BELOW THIS LINE =================================================

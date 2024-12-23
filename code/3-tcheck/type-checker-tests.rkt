@@ -448,6 +448,16 @@
   (test-raises-error? "and-12"
                (type-check `{if false {+ 5 "error skibidi"} "short"}))
   
+  ;; short-circuit
+  (test-equal?  "if-13"
+               (type-check `{if false {first {empty : Str}} "short"})
+               (t-str))
+
+  ;; short-circuit
+  (test-equal?  "if-14"
+               (type-check `{if true "short" {first {empty : Str}}})
+               (t-str))
+
   ;; INFO:
   ;; LAM STATEMENT 
   
