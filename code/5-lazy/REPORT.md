@@ -14,21 +14,9 @@ Assuming the interpreter evaluates from left to right. It will evaluate `{take 3
 which would result in a lambda function which expects a *list* of numbers. Afterwards,
 the interpreter will evaluate the argument. This is in contrast with a lazy interpreter
 which would **not** evaluate the argument. It will try to evaluate `{nats-from 0}`,
-good luck with that...
+good luck with that... . `natsfrom 0` will loop forever and never get back to the function `{take 3}`
 
-Evaluating `{nats-from 0}` would result in an infinite loop.
-Basically, `nats-from` is the equivalent of the following program
-
-```haskell
-> natsfrom n = n : natsfrom (n + 1)
-> natsfrom 0
-```
-
-`natsfrom 0` will loop forever and never get back to the function `take 3`
-
-### 2. In call-by-need or lazy languages like Haskell, the language provides a "strictly" or "forcing" operator (i.e. Haskell's `seq`) as a way for programmers to specify when they want to escape laziness and enforce eager evaluation
-
-What steps are required to include `seq` in this lazy language, and explain using two different examples why such an operator might be useful.
+### 2. In call-by-need or lazy languages like Haskell, the language provides a "strictly" or "forcing" operator (i.e. Haskell's `seq`) as a way for programmers to specify when they want to escape laziness and enforce eager evaluation. What steps are required to include `seq` in this lazy language, and explain using two different examples why such an operator might be useful
 
 The `seq` operator takes in two expressions. It eagerly evaluates the first expression
 and returns the result of the evaluated second expression. The following is the steps
@@ -38,9 +26,8 @@ needed in order to include `seq` into the miniPLAIT language.
 - Add a `seq` operator to the AST, i.e. under binary operators.
 - Add a `seq` case to the desugarer & interpreter and type-checker
 
-In the interpreter, you would want to deeply strictly evaluate the first expression given by `seq`.
-This deep strict operator is already present and is used for the top-level evaluation.
-You drop the result of the first expression and start evaluating the second expression in the same fashion.
+In the interpreter, you would want to strictly evaluate the first expression given by `seq`.
+You drop the result of the first expression and start evaluating the second expression.
 Once finished, you return the value of the second expression. This is inline with how `seq` does it in Haskell.
 
 ```haskell
@@ -64,11 +51,11 @@ Such an operator `seq` could be implemented as follows:
 
 On to the uses cases for such an operator.
 
-- First use case:
+- First use case:  
 You would want to not stack a lot of suspensions before continuing execution.
-This could be for performance reasons, and to free some memory. The following
+This could be for performance reasons, and to free some memory.
 
-- Second use case:
+- Second use case:  
 Debugging can become difficult since you don't know exactly when an expression will be
 evaluated. It depends on the strictness points and which of those the interpreter will
 be using for a particular expression. The operator `seq` essentially adds your own strictness
